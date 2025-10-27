@@ -25,7 +25,7 @@ set.seed(26)
 # load modified species taxonomy for species
 taxonomy_mod_98 <- read.csv("taxonomia_mod_98.csv")
 
-# Create OTU tables for the sequences and species
+# Create OTU table
 OTU_table <- seqtab.nochim
 
 sequences <- colnames(OTU_table)
