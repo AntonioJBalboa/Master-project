@@ -97,7 +97,7 @@ set.seed(26)
 
 # Validation of the algorithm for taxonomy and sequences and obtaining metrics
 # Add-one procedure. The reintroduction of each ASV is evaluated after conservative filtering
-k_especies <- k_finetune(
+k_especies <- k_validation(
   OTU_table = OTU_table_df,
   ground_truth = ground_truth_species,
   alpha = 0.5,
@@ -105,7 +105,7 @@ k_especies <- k_finetune(
   mode ="taxonomy"
 )
 
-k_secuencias <- k_finetune(
+k_secuencias <- k_validation(
   OTU_table = OTU_table_df,
   ground_truth = ground_truth_sequences,
   alpha = 0.5,
@@ -138,7 +138,7 @@ for (alpha in alpha_vals) {
   beta <- 1 - alpha
   cat("Runnning alpha =", alpha, "beta =", beta, "\n")
   
-  k_fit <- k_finetune(
+  k_fit <- k_validation2(
     OTU_table = OTU_table_df,
     ground_truth = ground_truth_sequences,  # or ground_truth_species
     alpha = alpha,
@@ -166,7 +166,7 @@ for (alpha in alpha_vals) {
 }
 
 # Display results sorted by F1 (highest to lowest)
-results_grid_search <- results[order(-results$F1), ]
+results_grid_search2 <- results[order(-results$F1), ]
 print(results_grid_search)
 ```
 
@@ -181,3 +181,13 @@ val_boot <- lapply(k_secuencias$asvs_recuperadas, function(asv_name) {
 
 val_boot_df <- data.frame(val_boot)
 ```
+
+```{r}
+sample_sums <- rowSums(OTU_table_df)
+low_depth_threshold <- 1000
+OTU_table_filt_1000 <- OTU_table_df[sample_sums >= low_depth_threshold, , drop = FALSE]
+
+low_depth_threshold <- 500
+OTU_table_filt_500 <- OTU_table_df[sample_sums >= low_depth_threshold, , drop = FALSE]
+```
+

@@ -53,6 +53,28 @@ calculate_k_w_single <- function(OTU_table, alpha, beta) {
   return(k_w)
 }
 
+calculate_k_w_single2 <- function(OTU_table, alpha, beta) {
+  
+  asv_num <- OTU_table %>%
+    mutate_if(is.integer, as.numeric) %>%
+    select(where(is.numeric))
+  
+  # Check if there is enough data to calculate
+  if (ncol(asv_num) < 2 || nrow(asv_num) < 2) {
+    return(0)
+  }
+  
+  J_mean <- mean(na.omit(evenness_k(asv_num)))
+  BC_mean <- mean(na.omit(bray_curtis(asv_num)))
+  
+  if (is.nan(J_mean) || is.nan(BC_mean)) {
+    return(0)
+  }
+  
+  k_w2 <- (J_mean*alpha) * (BC_mean*beta)
+  return(k_w2)
+}
+
 
 # Conservative filter
 conservative_filter <- function(OTU_table) {
@@ -77,7 +99,7 @@ conservative_filter <- function(OTU_table) {
   
   # Rule 2: < 0.005% total relative abundance (0.00005)
   relative_abundance <- col_totals / total_reads_dataset
-  C2_delete <- relative_abundance < 0.00005
+  C2_delete <- relative_abundance < 0.00001
   
   # Rule 3: Appears in < 2 samples (only 1)
   C3_delete <- samples_present < 2
@@ -85,8 +107,8 @@ conservative_filter <- function(OTU_table) {
   # Combine
   asv_to_delete_bool <- C1_delete | C2_delete | C3_delete
   
-  asv_ids_to_preserve <- colnames(OTU_table)[!asv_para_delete_bool]
-  asv_ids_to_delete <- colnames(OTU_table)[asv_para_delete_bool]
+  asv_ids_to_preserve <- colnames(OTU_table)[!asv_to_delete_bool]
+  asv_ids_to_delete <- colnames(OTU_table)[asv_to_delete_bool]
   
   # Two lists. One with the preserved ASVs and another with the filtered ones
   return(list(
@@ -203,6 +225,115 @@ k_validation <- function(OTU_table, ground_truth, alpha, beta, mode){
     time = time.take
   ))
 }
+
+# Add-one procedure
+k_validation2 <- function(OTU_table, ground_truth, alpha, beta, mode){
+  
+  start.time <- Sys.time() 
+  mode <- match.arg(mode, choices = c("taxonomy", "sequence"))
+  
+  # Preprocessed to ensure all columns are numeric
+  asv <- OTU_table %>%
+    mutate_if(is.integer, as.numeric) %>%
+    select(where(is.numeric))
+  
+  # Unfiltered OTU Table Values
+  k_unfiltered <- calculate_k_w_single2(asv, alpha, beta)
+  BC_unfiltered <- mean(na.omit(bray_curtis(asv)))
+  J_unfiltered <- mean(na.omit(evenness_k(asv)))
+  
+  # apply conservative filter
+  filter_output <- conservative_filter(asv)
+  asv_preserved <- filter_output$preserved
+  asv_deleted <- filter_output$deleted
+  
+  discarded_asv <- colnames(asv_deleted)
+  keep_asv <- colnames(asv_preserved)
+  
+  # Initial values after conservative filtering
+  k_0 <- calculate_k_w_single2(asv_preserved, alpha, beta)
+  BC_0 <- mean(na.omit(bray_curtis(asv_preserved)))
+  J_0 <- mean(na.omit(evenness_k(asv_preserved)))
+  
+  # Create vectors to record the results
+  added_asv <- k_values <- BC_values <- J_values <- c()
+  true_positive_flags <- c() 
+  
+  # Pipeline add-one
+  for (asv_name in discarded_asv) {
+    asv_table_i <- cbind(asv_preserved, asv[, asv_name, drop = FALSE])
+    
+    k_i <- calculate_k_w_single2(asv_table_i, alpha, beta)
+    bc_i <- mean(na.omit(bray_curtis(asv_table_i)))
+    j_i <- mean(na.omit(evenness_k(asv_table_i)))
+    
+    # Evaluate with ground_truth depending on the chosen mode
+    
+    if (mode == "taxonomy") {
+      asv_identity <- seq_dict$taxa[match(asv_name, seq_dict$ASV)]
+      match_truth <- asv_identity %in% ground_truth_species
+    } else if (mode == "sequence") {
+      asv_identity <- seq_dict$Sequence[match(asv_name, seq_dict$ASV)]
+      match_truth <- any(sapply(ground_truth_sequences$Sequence, function(gt) {
+        grepl(asv_identity, gt, fixed = TRUE) || grepl(gt, asv_identity, fixed = TRUE)
+      }))
+    }
+    
+    added_asv <- c(added_asv, asv_name)
+    k_values <- c(k_values, k_i)
+    BC_values <- c(BC_values, bc_i)
+    J_values <- c(J_values, j_i)
+    true_positive_flags <- c(true_positive_flags, match_truth)
+    
+  }
+  
+  # Select ASVs that actually went up k
+  reintroduced_asvs <- added_asv[k_values > k_0]
+  reintroduced_flags <- true_positive_flags[k_values > k_0]
+  
+  TP <- sum(reintroduced_flags)
+  FP <- sum(!reintroduced_flags)
+  
+  precision <- ifelse((TP + FP) > 0, TP / (TP + FP), NA)
+  recall <- ifelse(length(reintroduced_asvs) > 0, TP / length(reintroduced_asvs), NA)
+  F1 <- ifelse(is.na(precision) | is.na(recall) | (precision + recall == 0),
+               NA,
+               2 * (precision * recall) / (precision + recall))
+  FDR <- ifelse((TP + FP) > 0, FP / (TP + FP), NA)
+  
+  k_max <- max(k_values, na.rm = TRUE)
+  
+  delta_k <- k_max - k_0
+  delta_k_rel <- ifelse(k_0 != 0, delta_k / k_0, NA)
+  
+  # Dataframe por ASV
+  df_results <- data.frame(
+    added_asv = added_asv,
+    k_values = k_values,
+    BC_values = BC_values,
+    J_values = J_values,
+    TP_flag = true_positive_flags
+  )
+  
+  end.time <- Sys.time()
+  time.take <- round(end.time - start.time, 2)
+  
+  return(list(
+    df_results = df_results,
+    k_inicial = k_0,
+    k_max = k_max,
+    delta_k = delta_k,
+    delta_k_rel = delta_k_rel,
+    asvs_recuperadas = reintroduced_asvs,
+    filtered_values = data.frame(k = k_0, BC = BC_0, J = J_0),
+    unfiltered_values = data.frame(k = k_unfiltered, BC = BC_unfiltered, J = J_unfiltered),
+    global_metrics = data.frame(TP = TP, FP = FP, precision = precision,
+                                recall = recall, FDR = FDR, F1 = F1),
+    time = time.take
+  ))
+}
+
+
 
 bootstrap_k <- function(OTU_table, asv_base, asv_candidate, 
                         approach = 1, alpha_weight = 0.5, beta_weight = 0.5, 
