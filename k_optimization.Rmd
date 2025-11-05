@@ -15,7 +15,7 @@ require(dplyr)
 require(purrr)
 require(ggupset)
 require(tibble)
-
+require(Biostrings)
 # Seed
 set.seed(26)
 ```
@@ -23,7 +23,7 @@ set.seed(26)
 
 ```{r ground truth, include=FALSE}
 # load modified species taxonomy for species
-taxonomy_mod_98 <- read.csv("taxonomia_mod_98.csv")
+taxonomy_mod_100 <- read.csv("taxonomia_mod_100.csv")
 
 # Create OTU table
 OTU_table <- seqtab.nochim
@@ -36,7 +36,7 @@ asv_ids <- paste0("ASV", seq_along(sequences))
 seq_dict <- data.frame(
   ASV = asv_ids,
   Sequence =  sequences,
-  taxa = taxonomia_mod_98$Genus_Species,
+  taxa = taxonomy_mod_100$Genus_Species,
   stringsAsFactors = FALSE)
 
 colnames(OTU_table) <- asv_ids
@@ -87,7 +87,7 @@ ground_truth_sequences <- data.frame(
                "TACGTAGGGAGCGAGCGTTATCCGGAATTACTGGGCGTGGGACTACCGGGGTATCTAATCCCGTTCGCTCCCCCGGCTTTCGCGCTTCAGCGTCAGATCACATCCAGCAAACCGCCTTCGCCACCGGTATTCTTCCTGAGTGTAGCCCTTGACGGGATTGCCCCGGGCGCCGCCGACTGAAACGCCGAGATTGTAGGTGTTTGCCAGGTATTCGGAGCCCTTGCGCGCGATCCATTCCAGGGCGCGCTTT"))
 
 
-ground_truth_species <- c("Bacillus_licheniformis","Bifidobacterium_longum","Rothia_mucilaginosa","Parvimonas_micra","Mogibacterium_timidum","Campylobacter_concisus","Eggerthella_lenta","Slackia_exigua","klebsiella_variicola","Fusobacterium_periodonticum","Leptotrichia_goodfellowii","Weisella_cibaria","Eikenella_corrodens","Neisseria_mucosa","Tannerella_sp","Prevotella_oralis","Capnocytophaga_sputigena","Granulicatella_adiacens","Streptococcus_gordonii","Gemella_morbillorum","Dialister_invisus","Veionella_parvula","Coprobacillus_cateniformis","Bifidobacterium_angulatum","Collinsella_aerofaciens","Bilophila_wadsworthia","Escherichia_coli","Fusobacterium_gonidiaformans","Fusobacterium_varium","Fusobacterium_ulcerans","Anaerostipes_hadrus","Clostridium_bolteae","Lactobacillus_iners","Pediococcus_acidilactici","Ralstonia_pickettii","Paenibacillus_barengoltzii","Parabacteroides_merdae","Bacteroides_caccae","Propionibacterium_acnes","Alistipes_shahii_","Subdoligranulum_variabile","Enterococcus_saccharolyticus","Synergistes_sp.")
+ground_truth_species <- c("Bacillus_licheniformis","Bifidobacterium_longum","Rothia_mucilaginosa","Parvimonas_micra","Mogibacterium_timidum","Campylobacter_concisus","Eggerthella_lenta","Slackia_exigua","klebsiella_variicola","Fusobacterium_periodonticum","Leptotrichia_goodfellowii","Weisella_cibaria","Eikenella_corrodens","Neisseria_mucosa","Tannerella_sp","Prevotella_oralis","Capnocytophaga_sputigena","Granulicatella_adiacens","Streptococcus_gordonii","Gemella_morbillorum","Dialister_invisus","Veionella_parvula","Coprobacillus_cateniformis","Bifidobacterium_angulatum","Collinsella_aerofaciens","Bilophila_wadsworthia","Escherichia_coli","Fusobacterium_gonidiaformans","Fusobacterium_varium","Fusobacterium_ulcerans","Anaerostipes_hadrus","Clostridium_bolteae","Lactobacillus_iners","Pediococcus_acidilactici","Ralstonia_pickettii","Paenibacillus_barengoltzii","Parabacteroides_merdae","Bacteroides_caccae","Propionibacterium_acnes","Alistipes_shahii","Subdoligranulum_variabile","Enterococcus_saccharolyticus","Synergistes_sp.")
 
 OTU_table_df <- data.frame(OTU_table)
 ```
@@ -115,7 +115,18 @@ k_secuencias <- k_validation(
 # Results
 k_especies_df <- k_especies$df_results
 k_secuencias_df <- k_secuencias$df_results
+
+
 ```
+
+```{r plots}
+# Variation of k for each reintroduced ASV
+plot_k(k_secuencias)
+
+#Variation of Evenness, Bray Curtis and k for each reintroduced ASV
+plot_J_BC_k(k_secuencias)
+```
+
 
 ```{r bootstrap for alpha and beta 0.5}
 val_boot_05_05 <- lapply(k_secuencias$asvs_recuperadas, function(asv_name) {
@@ -130,15 +141,16 @@ val_boot_05_05_df <- data.frame(val_boot_05_05)
 ```
 
 ```{r optimization with grid search}
+set.seed(26)
 # Define the complementary values of alpha and beta
-alpha_vals <- seq(0, 1, 0.1) 
+alpha_vals <- seq(0, 1 , 0.1) 
 results <- data.frame()
 
 for (alpha in alpha_vals) {
   beta <- 1 - alpha
   cat("Runnning alpha =", alpha, "beta =", beta, "\n")
   
-  k_fit <- k_validation2(
+  k_fit <- k_validation(
     OTU_table = OTU_table_df,
     ground_truth = ground_truth_sequences,  # or ground_truth_species
     alpha = alpha,
@@ -154,6 +166,7 @@ for (alpha in alpha_vals) {
   results <- rbind(results, data.frame(
     alpha = alpha,
     beta = beta,
+    Recovered_ASVs = length(k_fit$asvs_recuperadas),
     precision = metrics$precision,
     recall = metrics$recall,
     FDR = metrics$FDR,
@@ -161,33 +174,24 @@ for (alpha in alpha_vals) {
     k_inicial = filtered$k,
     k_max = k_fit$k_max,
     delta_k = k_fit$delta_k,
-    tiempo = as.numeric(k_fit$time)
+    time = as.numeric(k_fit$time)
   ))
 }
 
 # Display results sorted by F1 (highest to lowest)
-results_grid_search2 <- results[order(-results$F1), ]
-print(results_grid_search)
+results_grid_search <- results[order(-results$F1), ]
 ```
+
+
 
 ```{r bootstrap for best weights}
 val_boot <- lapply(k_secuencias$asvs_recuperadas, function(asv_name) {
   bootstrap_k(OTU_table_df, 
               asv_base = k_secuencias$filtered_values,
               asv_candidate = asv_name,
-              approach = 1,   #  we accept if it 1 = is significant, 2 = doesn't get worse
+              approach = 1,   
               alpha_weight = , beta_weight = ) # Indicate weights
 })
 
 val_boot_df <- data.frame(val_boot)
 ```
-
-```{r}
-sample_sums <- rowSums(OTU_table_df)
-low_depth_threshold <- 1000
-OTU_table_filt_1000 <- OTU_table_df[sample_sums >= low_depth_threshold, , drop = FALSE]
-
-low_depth_threshold <- 500
-OTU_table_filt_500 <- OTU_table_df[sample_sums >= low_depth_threshold, , drop = FALSE]
-```
-
