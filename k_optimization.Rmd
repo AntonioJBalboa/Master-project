@@ -181,7 +181,6 @@ for (alpha in alpha_vals) {
 results_grid2_search0.01_ <- results[order(-results$F1), ]
 ```
 
-
 ```{r optimization with grid search species}
 set.seed(26)
 # Define the complementary values of alpha and beta
@@ -229,7 +228,7 @@ val_boot <- lapply(k_secuencias$asvs_recuperadas, function(asv_name) {
   bootstrap_k(OTU_table = OTU_table_df, 
               asv_base = k_secuencias$filtered_values,
               asv_candidate = asv_name,
-              alpha = 0.05
+              alpha = 0.05,
               alpha_weight = , beta_weight = ) # Indicate weights
 })
 

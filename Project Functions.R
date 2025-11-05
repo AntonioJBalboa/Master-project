@@ -451,7 +451,6 @@ k_validation3 <- function(OTU_table, ground_truth, alpha, beta, mode){
 }
 
 
-
 bootstrap_k <- function(OTU_table, asv_base, asv_candidate, 
                         alpha_weight, beta_weight = 0.5, 
                         n_boot, alpha) {
