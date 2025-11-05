@@ -178,7 +178,7 @@ for (alpha in alpha_vals) {
 }
 
 # Display results sorted by F1 (highest to lowest)
-results_grid2_search0.01_ <- results[order(-results$F1), ]
+results_grid2_search <- results[order(-results$F1), ]
 ```
 
 ```{r optimization with grid search species}
@@ -222,6 +222,8 @@ for (alpha in alpha_vals) {
 # Display results sorted by F1 (highest to lowest)
 results_grid_search_species <- results[order(-results$F1), ]
 ```
+
+
 
 ```{r bootstrap for best weights}
 val_boot <- lapply(k_secuencias$asvs_recuperadas, function(asv_name) {

@@ -99,7 +99,11 @@ conservative_filter <- function(OTU_table) {
   
   # Rule 2: < 0.005% total relative abundance (0.00005)
   relative_abundance <- col_totals / total_reads_dataset
+<<<<<<< HEAD
   C2_delete <- relative_abundance < 0.0001 
+=======
+  C2_delete <- relative_abundance < 0.00005 
+>>>>>>> 0dc2858e19eca4e67706166a14f7adc40a5eb6f6
   
   # Rule 3: Appears in < 2 samples (only 1)
   C3_delete <- samples_present < 2
@@ -450,7 +454,6 @@ k_validation3 <- function(OTU_table, ground_truth, alpha, beta, mode){
   ))
 }
 
-
 bootstrap_k <- function(OTU_table, asv_base, asv_candidate, 
                         alpha_weight, beta_weight = 0.5, 
                         n_boot, alpha) {
@@ -483,7 +486,7 @@ bootstrap_k <- function(OTU_table, asv_base, asv_candidate,
   
   # Calculation of the p-value
   
-    p_value <- (sum(delta_boot <= 0) + 1) / (length(delta_boot) + 1)
+  p_value <- (sum(delta_boot <= 0) + 1) / (length(delta_boot) + 1)
  
   
   signif <-  p_value < alpha
