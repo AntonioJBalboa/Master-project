@@ -496,6 +496,8 @@ bootstrap_k <- function(OTU_table, asv_base, asv_candidate,
 
 
                     #      |------------------------------------|
+
+
 # Plots
 plot_k <- function(results) {
   

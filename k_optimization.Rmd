@@ -127,7 +127,6 @@ plot_k(k_secuencias)
 plot_J_BC_k(k_secuencias)
 ```
 
-
 ```{r bootstrap for alpha and beta 0.5}
 val_boot_05_05 <- lapply(k_secuencias$asvs_recuperadas, function(asv_name) {
   bootstrap_k(OTU_table = OTU_table_df, n_boot = 1500, 
@@ -222,8 +221,6 @@ for (alpha in alpha_vals) {
 # Display results sorted by F1 (highest to lowest)
 results_grid_search_species <- results[order(-results$F1), ]
 ```
-
-
 
 ```{r bootstrap for best weights}
 val_boot <- lapply(k_secuencias$asvs_recuperadas, function(asv_name) {
