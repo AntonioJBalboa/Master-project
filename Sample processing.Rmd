@@ -24,25 +24,25 @@ set.seed(26)
 
 ```{r}
 # Cargamos las lecturas
-r1 <- sort(list.files("A:/DOCUMENTOS/Máster Bioinformática y Bioestadística/TFM/Master project/trimmed_fixed2", pattern = "_1.trimmed.fastq", full.names = TRUE))
-r2 <- sort(list.files("A:/DOCUMENTOS/Máster Bioinformática y Bioestadística/TFM/Master project/trimmed_fixed2", pattern = "_2.trimmed.fastq", full.names = TRUE))
+r1 <- sort(list.files("A:/DOCUMENTOS/Máster Bioinformática y Bioestadística/TFM/Master project/muestras", pattern = "_1.fastq", full.names = TRUE))
+r2 <- sort(list.files("A:/DOCUMENTOS/Máster Bioinformática y Bioestadística/TFM/Master project/muestras", pattern = "_2.fastq", full.names = TRUE))
 
 # PlotQualityProfile O FASTQC
 #plotQualityProfile(r1)
 #plotQualityProfile(r2)
 
 # extract names from the samples
-samples_names <- sapply(strsplit(basename(r1), "_1.trimmed.fastq"), `[`, 1)
+samples_names <- sapply(strsplit(basename(r1), "_1.fastq"), `[`, 1)
 
 
 # Define names
-if (!dir.exists("filtered_fastq_2")) {
-  dir.create("filtered_fastq_2")
+if (!dir.exists("filtered_fastq")) {
+  dir.create("filtered_fastq")
 }
 
 # create output folders for filtered sequencess
-filt_forwards <- file.path("filtered_fastq_2", paste0(samples_names, "_F_filt.fastq"))
-filt_reverse <- file.path("filtered_fastq_2", paste0(samples_names, "_R_filt.fastq"))
+filt_forwards <- file.path("filtered_fastq", paste0(samples_names, "_F_filt.fastq"))
+filt_reverse <- file.path("filtered_fastq", paste0(samples_names, "_R_filt.fastq"))
 
 names(filt_forwards) <- samples_names
 names(filt_reverse) <- samples_names
@@ -57,8 +57,12 @@ out <- filterAndTrim(r1, filt_forwards, r2, filt_reverse,
                      compress=FALSE, 
                      multithread=TRUE)
 
-errF <- learnErrors(filt_forwards, multithread=TRUE)
+errF<- learnErrors(filt_forwards, multithread=TRUE)
 errR <- learnErrors(filt_reverse, multithread=TRUE)
+
+# Plot errors
+plotErrors(errF, nominalQ=TRUE)
+plotErrors(errR, nominalQ = TRUE)
 
 dadaFs <- dada(filt_forwards, err=errF, multithread=TRUE)
 dadaRs <- dada(filt_reverse, err=errR, multithread=TRUE)
@@ -69,13 +73,15 @@ seqtab <- makeSequenceTable(mergers)
 
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
 
-taxa <- assignTaxonomy(seqtab.nochim, "silva_nr_v132_train_set.fa.gz", multithread=TRUE)
+taxa <- assignTaxonomy(seqtab.nochim2, "silva_nr_v132_train_set.fa.gz", multithread=TRUE)
 taxa <- addSpecies(taxa, "silva_species_assignment_v132.fa")
 
-# silva 138.1
-#taxa138 <- assignTaxonomy(seqtab.nochim_2, "silva_nr99_v138.1_train_set.fa.gz")
-#taxa138 <- addSpecies(taxa138_2, "silva_species_assignment_v138.1.fa.gz")
+# Save as CSV
+write.csv(seqtab.nochim2, "ASV_table.csv")
 ```
+
+
+
 
 
 
