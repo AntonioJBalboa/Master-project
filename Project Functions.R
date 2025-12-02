@@ -90,23 +90,23 @@ k3 <- function(OTU_table, alpha, beta) {
   
   #Calculation of chao1 and normalization
   chao_vals <- chao1(asv_num)
-  chao_mean <- mean(chao_vals, na.rm = TRUE)
-  total_asvs <- ncol(asv_num)
-  chao_norm <- ifelse(total_asvs > 0, chao_mean / total_asvs, 0)
+  #chao_mean <- mean(chao_vals, na.rm = TRUE)
+  #total_asvs <- ncol(asv_num)
+  #chao_norm <- ifelse(total_asvs > 0, chao_mean / total_asvs, 0)
   
   # Normalize using min-max
-  #normalize_01 <- function(x){
-    #if (length(unique(x)) == 1) return(rep(0, length(x)))
-    #(x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
-  #}
-  #chao_norm <- normalize_01(chao_vals)
-  #chao_mean_norm <- mean(chao_norm, na.rm = TRUE)
+  normalize_01 <- function(x){
+    if (length(unique(x)) == 1) return(rep(0, length(x)))
+    (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
+  }
+  chao_norm <- normalize_01(chao_vals)
+  chao_mean_norm <- mean(chao_norm, na.rm = TRUE)
   
   #Bray Curtis
   BC_mean <- mean(na.omit(bray_curtis(asv_num)))
   
-  #k3 <- (chao_mean_norm^alpha) * (BC_mean^beta)
-  k3 <- (chao_norm^alpha) * (BC_mean^beta)
+  k3 <- (chao_mean_norm^alpha) * (BC_mean^beta)
+  #k3 <- (chao_norm^alpha) * (BC_mean^beta)
   return(k3)
 }
 

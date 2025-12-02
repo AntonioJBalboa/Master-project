@@ -257,6 +257,8 @@ for (filt_name in names(filter_configs)) {
 }
 ```
 
+
+
 ```{r}
 # Iterate over the filters
 for (filt_name in names(filter_configs)) {
@@ -287,7 +289,7 @@ for (filt_name in names(filter_configs)) {
       # Save results
       plot_id <- paste(filt_name, mode_name, a, b, sep = "_")
       
-      all_plots_list[[plot_id]] <- plot_k(k_optimization)
+      all_plots_list_k2[[plot_id]] <- plot_k(k_optimization)
       
       df <- k_optimization$df_results
       
@@ -301,6 +303,167 @@ for (filt_name in names(filter_configs)) {
     }
   }
 }
+```
+
+```{r}
+# Plots k2
+# Filter 1
+print(all_plot_list_k2$`1_taxonomy_0.5_0.5`)
+print(all_plot_list_k2$`1_taxonomy_0.6_0.4`)
+print(all_plot_list_k2$`1_taxonomy_0.7_0.3`)
+print(all_plot_list_k2$`1_taxonomy_0.8_0.2`)
+print(all_plot_list_k2$`1_taxonomy_0.9_0.1`)
+print(all_plot_list_k2$`1_taxonomy_1_0`)
+print(all_plot_list_k2$`1_taxonomy_0.4_0.6`)
+print(all_plot_list_k2$`1_taxonomy_0.3_0.7`)
+print(all_plot_list_k2$`1_taxonomy_0.2_0.8`)
+print(all_plot_list_k2$`1_taxonomy_0.1_0.9`)
+print(all_plot_list_k2$`1_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k2
+# Filter 2
+print(all_plot_list_k2$`2_taxonomy_0.5_0.5`)
+print(all_plot_list_k2$`2_taxonomy_0.6_0.4`)
+print(all_plot_list_k2$`2_taxonomy_0.7_0.3`)
+print(all_plot_list_k2$`2_taxonomy_0.8_0.2`)
+print(all_plot_list_k2$`2_taxonomy_0.9_0.1`)
+print(all_plot_list_k2$`2_taxonomy_1_0`)
+print(all_plot_list_k2$`2_taxonomy_0.4_0.6`)
+print(all_plot_list_k2$`2_taxonomy_0.3_0.7`)
+print(all_plot_list_k2$`2_taxonomy_0.2_0.8`)
+print(all_plot_list_k2$`2_taxonomy_0.1_0.9`)
+print(all_plot_list_k2$`2_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k2
+# Filter 3
+print(all_plot_list_k2$`3_taxonomy_0.5_0.5`)
+print(all_plot_list_k2$`3_taxonomy_0.6_0.4`)
+print(all_plot_list_k2$`3_taxonomy_0.7_0.3`)
+print(all_plot_list_k2$`3_taxonomy_0.8_0.2`)
+print(all_plot_list_k2$`3_taxonomy_0.9_0.1`)
+print(all_plot_list_k2$`3_taxonomy_1_0`)
+print(all_plot_list_k2$`3_taxonomy_0.4_0.6`)
+print(all_plot_list_k2$`3_taxonomy_0.3_0.7`)
+print(all_plot_list_k2$`3_taxonomy_0.2_0.8`)
+print(all_plot_list_k2$`3_taxonomy_0.1_0.9`)
+print(all_plot_list_k2$`3_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k2
+# Filter 4
+print(all_plot_list_k2$`4_taxonomy_0.5_0.5`)
+print(all_plot_list_k2$`4_taxonomy_0.6_0.4`)
+print(all_plot_list_k2$`4_taxonomy_0.7_0.3`)
+print(all_plot_list_k2$`4_taxonomy_0.8_0.2`)
+print(all_plot_list_k2$`4_taxonomy_0.9_0.1`)
+print(all_plot_list_k2$`4_taxonomy_1_0`)
+print(all_plot_list_k2$`4_taxonomy_0.4_0.6`)
+print(all_plot_list_k2$`4_taxonomy_0.3_0.7`)
+print(all_plot_list_k2$`4_taxonomy_0.2_0.8`)
+print(all_plot_list_k2$`4_taxonomy_0.1_0.9`)
+print(all_plot_list_k2$`4_taxonomy_0_1`)
+```
+
+
+```{r}
+# Plots k2
+# Filter 5
+print(all_plot_list_k2$`5_taxonomy_0.5_0.5`)
+print(all_plot_list_k2$`5_taxonomy_0.6_0.4`)
+print(all_plot_list_k2$`5_taxonomy_0.7_0.3`)
+print(all_plot_list_k2$`5_taxonomy_0.8_0.2`)
+print(all_plot_list_k2$`5_taxonomy_0.9_0.1`)
+print(all_plot_list_k2$`5_taxonomy_1_0`)
+print(all_plot_list_k2$`5_taxonomy_0.4_0.6`)
+print(all_plot_list_k2$`5_taxonomy_0.3_0.7`)
+print(all_plot_list_k2$`5_taxonomy_0.2_0.8`)
+print(all_plot_list_k2$`5_taxonomy_0.1_0.9`)
+print(all_plot_list_k2$`5_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k2
+# Filter 6
+print(all_plot_list_k2$`6_taxonomy_0.5_0.5`)
+print(all_plot_list_k2$`6_taxonomy_0.6_0.4`)
+print(all_plot_list_k2$`6_taxonomy_0.7_0.3`)
+print(all_plot_list_k2$`6_taxonomy_0.8_0.2`)
+print(all_plot_list_k2$`6_taxonomy_0.9_0.1`)
+print(all_plot_list_k2$`6_taxonomy_1_0`)
+print(all_plot_list_k2$`6_taxonomy_0.4_0.6`)
+print(all_plot_list_k2$`6_taxonomy_0.3_0.7`)
+print(all_plot_list_k2$`6_taxonomy_0.2_0.8`)
+print(all_plot_list_k2$`6_taxonomy_0.1_0.9`)
+print(all_plot_list_k2$`6_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k2
+# Filter 7
+print(all_plot_list_k2$`7_taxonomy_0.5_0.5`)
+print(all_plot_list_k2$`7_taxonomy_0.6_0.4`)
+print(all_plot_list_k2$`7_taxonomy_0.7_0.3`)
+print(all_plot_list_k2$`7_taxonomy_0.8_0.2`)
+print(all_plot_list_k2$`7_taxonomy_0.9_0.1`)
+print(all_plot_list_k2$`7_taxonomy_1_0`)
+print(all_plot_list_k2$`7_taxonomy_0.4_0.6`)
+print(all_plot_list_k2$`7_taxonomy_0.3_0.7`)
+print(all_plot_list_k2$`7_taxonomy_0.2_0.8`)
+print(all_plot_list_k2$`7_taxonomy_0.1_0.9`)
+print(all_plot_list_k2$`7_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k2
+# Filter 8
+print(all_plot_list_k2$`8_taxonomy_0.5_0.5`)
+print(all_plot_list_k2$`8_taxonomy_0.6_0.4`)
+print(all_plot_list_k2$`8_taxonomy_0.7_0.3`)
+print(all_plot_list_k2$`8_taxonomy_0.8_0.2`)
+print(all_plot_list_k2$`8_taxonomy_0.9_0.1`)
+print(all_plot_list_k2$`8_taxonomy_1_0`)
+print(all_plot_list_k2$`8_taxonomy_0.4_0.6`)
+print(all_plot_list_k2$`8_taxonomy_0.3_0.7`)
+print(all_plot_list_k2$`8_taxonomy_0.2_0.8`)
+print(all_plot_list_k2$`8_taxonomy_0.1_0.9`)
+print(all_plot_list_k2$`8_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k2
+# Filter 9
+print(all_plot_list_k2$`9_taxonomy_0.5_0.5`)
+print(all_plot_list_k2$`9_taxonomy_0.6_0.4`)
+print(all_plot_list_k2$`9_taxonomy_0.7_0.3`)
+print(all_plot_list_k2$`9_taxonomy_0.8_0.2`)
+print(all_plot_list_k2$`9_taxonomy_0.9_0.1`)
+print(all_plot_list_k2$`9_taxonomy_1_0`)
+print(all_plot_list_k2$`9_taxonomy_0.4_0.6`)
+print(all_plot_list_k2$`9_taxonomy_0.3_0.7`)
+print(all_plot_list_k2$`9_taxonomy_0.2_0.8`)
+print(all_plot_list_k2$`9_taxonomy_0.1_0.9`)
+print(all_plot_list_k2$`9_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k2
+# Filter 10
+print(all_plot_list_k2$`10_taxonomy_0.5_0.5`)
+print(all_plot_list_k2$`10_taxonomy_0.6_0.4`)
+print(all_plot_list_k2$`10_taxonomy_0.7_0.3`)
+print(all_plot_list_k2$`10_taxonomy_0.8_0.2`)
+print(all_plot_list_k2$`10_taxonomy_0.9_0.1`)
+print(all_plot_list_k2$`10_taxonomy_1_0`)
+print(all_plot_list_k2$`10_taxonomy_0.4_0.6`)
+print(all_plot_list_k2$`10_taxonomy_0.3_0.7`)
+print(all_plot_list_k2$`10_taxonomy_0.2_0.8`)
+print(all_plot_list_k2$`10_taxonomy_0.1_0.9`)
+print(all_plot_list_k2$`10_taxonomy_0_1`)
 ```
 
 
@@ -333,7 +496,7 @@ write_xlsx(tabla_metricas_final,"k2_metrics.xlsx")
 
 
 ```{r}
-k_prueba_chao <- k_validation_pairwaise_k3(
+k_prueba_chao05 <- k_validation_pairwaise_k3(
         OTU_table = OTU_table_filt_df,
         ground_truth = ground_truth_taxa,
         alpha = 0.5,
@@ -342,13 +505,307 @@ k_prueba_chao <- k_validation_pairwaise_k3(
         filter_parameters = filter_configs[["1"]]
 )
 
-k_prueba_jaccard <- k_validation_pairwaise_k4(
+k_prueba_chao06 <- k_validation_pairwaise_k3(
         OTU_table = OTU_table_filt_df,
         ground_truth = ground_truth_taxa,
-        alpha = 0.5,
-        beta = 0.5,
+        alpha = 0.6,
+        beta = 0.4,
         mode = "taxonomy",
         filter_parameters = filter_configs[["1"]]
 )
+
+k_prueba_chao07 <- k_validation_pairwaise_k3(
+        OTU_table = OTU_table_filt_df,
+        ground_truth = ground_truth_taxa,
+        alpha = 0.7,
+        beta = 0.3,
+        mode = "taxonomy",
+        filter_parameters = filter_configs[["1"]]
+)
+k_prueba_chao08 <- k_validation_pairwaise_k3(
+        OTU_table = OTU_table_filt_df,
+        ground_truth = ground_truth_taxa,
+        alpha = 0.8,
+        beta = 0.2,
+        mode = "taxonomy",
+        filter_parameters = filter_configs[["1"]]
+)
+k_prueba_chao09 <- k_validation_pairwaise_k3(
+        OTU_table = OTU_table_filt_df,
+        ground_truth = ground_truth_taxa,
+        alpha = 0.9,
+        beta = 0.1,
+        mode = "taxonomy",
+        filter_parameters = filter_configs[["1"]]
+)
+k_prueba_chao1 <- k_validation_pairwaise_k3(
+        OTU_table = OTU_table_filt_df,
+        ground_truth = ground_truth_taxa,
+        alpha = 1,
+        beta = 0,
+        mode = "taxonomy",
+        filter_parameters = filter_configs[["1"]]
+)
+k_prueba_chao04 <- k_validation_pairwaise_k3(
+        OTU_table = OTU_table_filt_df,
+        ground_truth = ground_truth_taxa,
+        alpha = 0.4,
+        beta = 0.6,
+        mode = "taxonomy",
+        filter_parameters = filter_configs[["1"]]
+)
+k_prueba_chao03 <- k_validation_pairwaise_k3(
+        OTU_table = OTU_table_filt_df,
+        ground_truth = ground_truth_taxa,
+        alpha = 0.3,
+        beta = 0.7,
+        mode = "taxonomy",
+        filter_parameters = filter_configs[["1"]]
+)
+k_prueba_chao02 <- k_validation_pairwaise_k3(
+        OTU_table = OTU_table_filt_df,
+        ground_truth = ground_truth_taxa,
+        alpha = 0.2,
+        beta = 0.8,
+        mode = "taxonomy",
+        filter_parameters = filter_configs[["1"]]
+)
+k_prueba_chao01 <- k_validation_pairwaise_k3(
+        OTU_table = OTU_table_filt_df,
+        ground_truth = ground_truth_taxa,
+        alpha = 0.1,
+        beta = 0.9,
+        mode = "taxonomy",
+        filter_parameters = filter_configs[["1"]]
+)
+
+plot_k(k_prueba_chao1)
+plot_k(k_prueba_chao09)
+plot_k(k_prueba_chao08)
+plot_k(k_prueba_chao07)
+plot_k(k_prueba_chao06)
+plot_k(k_prueba_chao05)
+plot_k(k_prueba_chao04)
+plot_k(k_prueba_chao03)
+plot_k(k_prueba_chao02)
+plot_k(k_prueba_chao01)
+
+#k_prueba_jaccard <- k_validation_pairwaise_k4(
+        #OTU_table = OTU_table_filt_df,
+        #ground_truth = ground_truth_taxa,
+        #alpha = 0.5,
+        #beta = 0.5,
+        #mode = "taxonomy",
+        #filter_parameters = filter_configs[["1"]]
+#)
 ```
 
+
+```{r approach with jaccard}
+all_plots_list_k4 <- list() # To save all graphs
+results_k4_df <- data.frame() # To save data
+
+for (filt_name in names(filter_configs)) {
+  
+  current_params <- filter_configs[[filt_name]]
+  
+  for (mode_name in names(ground_truths_list)) {
+    
+    current_gt <- ground_truths_list[[mode_name]]
+    
+    message(paste("Processing:", filt_name, "| Mode:", mode_name))
+  
+    # Grid search
+    for (i in 1:nrow(weight_grid)) {
+      
+      a <- weight_grid$alpha[i]
+      b <- weight_grid$beta[i]
+      
+      k_optimization <- k_validation_pairwaise_k4(
+        OTU_table = OTU_table_filt_df,
+        ground_truth = current_gt,
+        alpha = a,
+        beta = b,
+        mode = mode_name,
+        filter_parameters = current_params
+      )
+      
+      # Save results
+      plot_id <- paste(filt_name, mode_name, a, b, sep = "_")
+      
+      all_plots_list_k4[[plot_id]] <- plot_k(k_optimization)
+      
+      df <- k_optimization$df_results
+      
+      df$Filter_Config <- filt_name
+      df$Mode <- mode_name
+      df$Alpha <- a
+      df$Beta <- b
+      
+      # Unir al dataframe principal
+      results_k4_df <- rbind(results_k4_df, df)
+    }
+  }
+}
+```
+
+```{r}
+# Plots k4
+# Filter 1
+print(all_plot_list_k4$`1_taxonomy_0.5_0.5`)
+print(all_plot_list_k4$`1_taxonomy_0.6_0.4`)
+print(all_plot_list_k4$`1_taxonomy_0.7_0.3`)
+print(all_plot_list_k4$`1_taxonomy_0.8_0.2`)
+print(all_plot_list_k4$`1_taxonomy_0.9_0.1`)
+print(all_plot_list_k4$`1_taxonomy_1_0`)
+print(all_plot_list_k4$`1_taxonomy_0.4_0.6`)
+print(all_plot_list_k4$`1_taxonomy_0.3_0.7`)
+print(all_plot_list_k4$`1_taxonomy_0.2_0.8`)
+print(all_plot_list_k4$`1_taxonomy_0.1_0.9`)
+print(all_plot_list_k4$`1_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k4
+# Filter 2
+print(all_plot_list_k4$`2_taxonomy_0.5_0.5`)
+print(all_plot_list_k4$`2_taxonomy_0.6_0.4`)
+print(all_plot_list_k4$`2_taxonomy_0.7_0.3`)
+print(all_plot_list_k4$`2_taxonomy_0.8_0.2`)
+print(all_plot_list_k4$`2_taxonomy_0.9_0.1`)
+print(all_plot_list_k4$`2_taxonomy_1_0`)
+print(all_plot_list_k4$`2_taxonomy_0.4_0.6`)
+print(all_plot_list_k4$`2_taxonomy_0.3_0.7`)
+print(all_plot_list_k4$`2_taxonomy_0.2_0.8`)
+print(all_plot_list_k4$`2_taxonomy_0.1_0.9`)
+print(all_plot_list_k4$`2_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k4
+# Filter 3
+print(all_plot_list_k4$`3_taxonomy_0.5_0.5`)
+print(all_plot_list_k4$`3_taxonomy_0.6_0.4`)
+print(all_plot_list_k4$`3_taxonomy_0.7_0.3`)
+print(all_plot_list_k4$`3_taxonomy_0.8_0.2`)
+print(all_plot_list_k4$`3_taxonomy_0.9_0.1`)
+print(all_plot_list_k4$`3_taxonomy_1_0`)
+print(all_plot_list_k4$`3_taxonomy_0.4_0.6`)
+print(all_plot_list_k4$`3_taxonomy_0.3_0.7`)
+print(all_plot_list_k4$`3_taxonomy_0.2_0.8`)
+print(all_plot_list_k4$`3_taxonomy_0.1_0.9`)
+print(all_plot_list_k4$`3_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k4
+# Filter 4
+print(all_plot_list_k4$`4_taxonomy_0.5_0.5`)
+print(all_plot_list_k4$`4_taxonomy_0.6_0.4`)
+print(all_plot_list_k4$`4_taxonomy_0.7_0.3`)
+print(all_plot_list_k4$`4_taxonomy_0.8_0.2`)
+print(all_plot_list_k4$`4_taxonomy_0.9_0.1`)
+print(all_plot_list_k4$`4_taxonomy_1_0`)
+print(all_plot_list_k4$`4_taxonomy_0.4_0.6`)
+print(all_plot_list_k4$`4_taxonomy_0.3_0.7`)
+print(all_plot_list_k4$`4_taxonomy_0.2_0.8`)
+print(all_plot_list_k4$`4_taxonomy_0.1_0.9`)
+print(all_plot_list_k4$`4_taxonomy_0_1`)
+```
+
+
+```{r}
+# Plots k4
+# Filter 5
+print(all_plot_list_k4$`5_taxonomy_0.5_0.5`)
+print(all_plot_list_k4$`5_taxonomy_0.6_0.4`)
+print(all_plot_list_k4$`5_taxonomy_0.7_0.3`)
+print(all_plot_list_k4$`5_taxonomy_0.8_0.2`)
+print(all_plot_list_k4$`5_taxonomy_0.9_0.1`)
+print(all_plot_list_k4$`5_taxonomy_1_0`)
+print(all_plot_list_k4$`5_taxonomy_0.4_0.6`)
+print(all_plot_list_k4$`5_taxonomy_0.3_0.7`)
+print(all_plot_list_k4$`5_taxonomy_0.2_0.8`)
+print(all_plot_list_k4$`5_taxonomy_0.1_0.9`)
+print(all_plot_list_k4$`5_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k4
+# Filter 6
+print(all_plot_list_k4$`6_taxonomy_0.5_0.5`)
+print(all_plot_list_k4$`6_taxonomy_0.6_0.4`)
+print(all_plot_list_k4$`6_taxonomy_0.7_0.3`)
+print(all_plot_list_k4$`6_taxonomy_0.8_0.2`)
+print(all_plot_list_k4$`6_taxonomy_0.9_0.1`)
+print(all_plot_list_k4$`6_taxonomy_1_0`)
+print(all_plot_list_k4$`6_taxonomy_0.4_0.6`)
+print(all_plot_list_k4$`6_taxonomy_0.3_0.7`)
+print(all_plot_list_k4$`6_taxonomy_0.2_0.8`)
+print(all_plot_list_k4$`6_taxonomy_0.1_0.9`)
+print(all_plot_list_k4$`6_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k4
+# Filter 7
+print(all_plot_list_k4$`7_taxonomy_0.5_0.5`)
+print(all_plot_list_k4$`7_taxonomy_0.6_0.4`)
+print(all_plot_list_k4$`7_taxonomy_0.7_0.3`)
+print(all_plot_list_k4$`7_taxonomy_0.8_0.2`)
+print(all_plot_list_k4$`7_taxonomy_0.9_0.1`)
+print(all_plot_list_k4$`7_taxonomy_1_0`)
+print(all_plot_list_k4$`7_taxonomy_0.4_0.6`)
+print(all_plot_list_k4$`7_taxonomy_0.3_0.7`)
+print(all_plot_list_k4$`7_taxonomy_0.2_0.8`)
+print(all_plot_list_k4$`7_taxonomy_0.1_0.9`)
+print(all_plot_list_k4$`7_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k4
+# Filter 8
+print(all_plot_list_k4$`8_taxonomy_0.5_0.5`)
+print(all_plot_list_k4$`8_taxonomy_0.6_0.4`)
+print(all_plot_list_k4$`8_taxonomy_0.7_0.3`)
+print(all_plot_list_k4$`8_taxonomy_0.8_0.2`)
+print(all_plot_list_k4$`8_taxonomy_0.9_0.1`)
+print(all_plot_list_k4$`8_taxonomy_1_0`)
+print(all_plot_list_k4$`8_taxonomy_0.4_0.6`)
+print(all_plot_list_k4$`8_taxonomy_0.3_0.7`)
+print(all_plot_list_k4$`8_taxonomy_0.2_0.8`)
+print(all_plot_list_k4$`8_taxonomy_0.1_0.9`)
+print(all_plot_list_k4$`8_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k4
+# Filter 9
+print(all_plot_list_k4$`9_taxonomy_0.5_0.5`)
+print(all_plot_list_k4$`9_taxonomy_0.6_0.4`)
+print(all_plot_list_k4$`9_taxonomy_0.7_0.3`)
+print(all_plot_list_k4$`9_taxonomy_0.8_0.2`)
+print(all_plot_list_k4$`9_taxonomy_0.9_0.1`)
+print(all_plot_list_k4$`9_taxonomy_1_0`)
+print(all_plot_list_k4$`9_taxonomy_0.4_0.6`)
+print(all_plot_list_k4$`9_taxonomy_0.3_0.7`)
+print(all_plot_list_k4$`9_taxonomy_0.2_0.8`)
+print(all_plot_list_k4$`9_taxonomy_0.1_0.9`)
+print(all_plot_list_k4$`9_taxonomy_0_1`)
+```
+
+```{r}
+# Plots k4
+# Filter 10
+print(all_plot_list_k4$`10_taxonomy_0.5_0.5`)
+print(all_plot_list_k4$`10_taxonomy_0.6_0.4`)
+print(all_plot_list_k4$`10_taxonomy_0.7_0.3`)
+print(all_plot_list_k4$`10_taxonomy_0.8_0.2`)
+print(all_plot_list_k4$`10_taxonomy_0.9_0.1`)
+print(all_plot_list_k4$`10_taxonomy_1_0`)
+print(all_plot_list_k4$`10_taxonomy_0.4_0.6`)
+print(all_plot_list_k4$`10_taxonomy_0.3_0.7`)
+print(all_plot_list_k4$`10_taxonomy_0.2_0.8`)
+print(all_plot_list_k4$`10_taxonomy_0.1_0.9`)
+print(all_plot_list_k4$`10_taxonomy_0_1`)
+```
