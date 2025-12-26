@@ -1,0 +1,649 @@
+---
+title: "k_Validation"
+author: "Antonio Jesús Balboa Ortega"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+set.seed(26)
+# Community filtering with a conventional filter
+community_filter_conventional <- conservative_filter(OTU_table = Env_Asv_table_filt_df, prevalence = 0, abundance_threshold = 0, col_max = 10, pct_samples_threshold = 0.05)
+community_filter_conventional <- as.data.frame(community_filter_conventional$preserved)
+
+community_filter_conventional2 <- conservative_filter(OTU_table = Env_Asv_table_filt_df, prevalence = 2, abundance_threshold = 0, col_max = 0, pct_samples_threshold = 0)
+community_filter_conventional2 <- as.data.frame(community_filter_conventional2$preserved)
+community_filter_conventional3 <- conservative_filter(OTU_table = Env_Asv_table_filt_df, prevalence = 0, abundance_threshold = 0.00005, col_max = 0, pct_samples_threshold = 0)
+
+
+ncol(community_filter_conventional$deleted)
+colnames(community_filter_conventional$deleted)
+ncol(community_filter_conventional2$deleted)
+colnames(community_filter_conventional2$deleted)
+ncol(community_filter_conventional3$deleted)
+
+# Community filtering by k2 approach
+# Filter with z-score
+k2_filter_z <- k2_validation(
+    OTU_table = Env_Asv_table_filt_df,
+    alpha = 0,
+    beta = 1,
+    filter_parameters = filter_configs[["1"]],
+    z_threshold = 1.36,
+    k_threshold = NULL
+)
+
+# Optimum filter for k2
+# % relative increase
+k2_initial_syncom <- 0.712721012  
+k2_best_syncom    <- 0.712722361
+k2_pct_increase <- (k2_best_syncom - k2_initial_syncom) / k2_initial_syncom
+k2_initial_env <- k2_filter_z$k_inicial
+k2_threshold_relative <- k2_initial_env * (1 + k2_pct_increase)
+
+k2_filter_k <- k2_validation(
+    OTU_table = Env_Asv_table_filt_df,
+    alpha = 0,
+    beta = 1,
+    filter_parameters = filter_configs[["1"]],
+    k_threshold = k2_threshold_relative
+)
+
+
+plot_z_threshold(k2_filter_z,z_threshold = 1.36)
+plot_k_threshold(k2_filter_k, k_threshold = k2_threshold_relative, top_n = 360)
+
+get_candidates(results = k2_filter_z, z_threshold = 1.36, k_threshold = NULL)
+get_candidates(results = k2_filter_k, k_threshold = k2_threshold_relative)
+# 
+intersect(colnames(community_filter_conventional$deleted), get_candidates(results = k2_filter_z, z_threshold = 1.36, k_threshold = NULL))
+
+intersect(colnames(community_filter_conventional2$deleted), get_candidates(results = k2_filter_z, z_threshold = 1.36, k_threshold = NULL))
+
+intersect(colnames(community_filter_conventional$deleted), get_candidates(results = k2_filter_k, k_threshold = k2_threshold_relative))
+
+intersect(colnames(community_filter_conventional2$deleted), get_candidates(results = k2_filter_k, k_threshold = k2_threshold_relative))
+#Another thresholds
+
+k4_filter_z <- k4_validation(
+    OTU_table = Env_Asv_table_filt_df,
+    alpha = 0.7,
+    beta = 0.3,
+    filter_parameters = filter_configs[["1"]],
+    z_threshold = 0.92,
+    k_threshold = NULL
+)
+
+k4_initial_syncom <-  0.737855709
+k4_best_syncom    <- 0.737869735
+k4_pct_increase <- (k4_best_syncom - k4_initial_syncom) / k4_initial_syncom
+k4_initial_env <- k4_filter_z$k_inicial
+k4_threshold_relative <- k4_initial_env * (1 + k4_pct_increase)
+
+k4_filter_k <- k4_validation(
+    OTU_table = Env_Asv_table_filt_df,
+    alpha = 0.7,
+    beta = 0.3,
+    filter_parameters = filter_configs[["1"]],
+    k_threshold = k4_threshold_relative
+)
+
+# Optimum filter for k4
+plot_z_threshold(k4_filter_z, z_threshold = 0.92 )
+
+plot_k_threshold(k4_filter_k, k_threshold = k4_threshold_relative, top_n = 100)
+get_candidates(results = k4_filter_z, z_threshold = 0.92, k_threshold = NULL)
+get_candidates(results = k4_filter_k, k_threshold = k4_threshold_relative)
+
+intersect(colnames(community_filter_conventional$deleted), get_candidates(results = k4_filter_z, z_threshold = 0.92, k_threshold = NULL))
+intersect(colnames(community_filter_conventional2$deleted), get_candidates(results = k4_filter_z, z_threshold = 0.92, k_threshold = NULL))
+
+intersect(colnames(community_filter_conventional$deleted), get_candidates(results = k4_filter_k, k_threshold = k4_threshold_relative))
+intersect(colnames(community_filter_conventional2$deleted), get_candidates(results = k4_filter_k,  k_threshold = k4_threshold_relative))
+
+
+# Obtain the filter communities for k2 and k4
+k2_community_z<- k2_filter_z$final_asv_table
+k2_community_k <-k2_filter_k$final_asv_table
+
+k4_community_z<- k4_filter_z$final_asv_table
+k4_community_k <-k4_filter_k$final_asv_table
+```
+
+```{r}
+# Performance of the filters
+# Filtered communties by apply the conventional and k based filters
+syncom_filter_conventional <- conservative_filter(OTU_table = OTU_table_filt_df, prevalence = 0, abundance_threshold = 0, col_max = 10, pct_samples_threshold = 0.05)
+syncom_filter_conventional <- as.data.frame(syncom_filter_conventional$preserved)
+
+syncom_filter_conventional2 <- conservative_filter(OTU_table = OTU_table_filt_df, prevalence = 2, abundance_threshold = 0, col_max = 0, pct_samples_threshold = 0)
+syncom_filter_conventional2 <- as.data.frame(syncom_filter_conventional2$preserved)
+
+k2_filter_syncom <- k2_validation(
+    OTU_table = OTU_table_filt_df,
+    alpha = 0,
+    beta = 1,
+    filter_parameters = filter_configs[["1"]],
+    z_threshold = 1.36,
+    k_threshold = NULL
+)
+k2_filter_syncom <-k2_filter_syncom$final_asv_table
+
+k4_filter_syncom <- k4_validation(
+    OTU_table = OTU_table_filt_df,
+    alpha = 0.7,
+    beta = 0.3,
+    filter_parameters = filter_configs[["1"]],
+    z_threshold = 0.92,
+    k_threshold = NULL
+)
+k4_filter_syncom <- k4_filter_syncom$final_asv_table
+
+# Final metrics for all filtered communities
+metrics_conv1 <- calculate_metrics_performance(
+  filtered_community = syncom_filter_conventional,
+  raw_community      = OTU_table_filt_df,
+  seq_dict           = seq_dict, 
+  ground_truth       = ground_truth_taxa,
+  penalty_weight     = 1,
+  method_name        = "Conventional (<10 reads)"
+)
+
+metrics_conv2 <- calculate_metrics_performance(
+  filtered_community = syncom_filter_conventional2,
+  raw_community      = OTU_table_filt_df,
+  seq_dict           = seq_dict,
+  ground_truth       = ground_truth_taxa,
+  penalty_weight     = 1,
+  method_name        = "Conventional (Prev<2)"
+)
+
+metrics_k2 <- calculate_metrics_performance(
+  filtered_community = k2_filter_syncom,
+  raw_community      = OTU_table_filt_df,
+  seq_dict           = seq_dict,
+  ground_truth       = ground_truth_taxa,
+  penalty_weight     = 1,
+  method_name        = "k2 filter"
+)
+
+metrics_k4 <- calculate_metrics_performance(
+  filtered_community = k4_filter_syncom,
+  raw_community      = OTU_table_filt_df,
+  seq_dict           = seq_dict,
+  ground_truth       = ground_truth_taxa,
+  penalty_weight     = 1,
+  method_name        = "k4 filter"
+)
+
+metrics_filters <- rbind(metrics_conv1, metrics_conv2, metrics_k2, metrics_k4)
+write_xlsx(metrics_filters,"Filter_metrics.xlsx")
+```
+
+```{r}
+# Valoration of the differents  filtered communities with metrics
+# List of communities
+list_communities <- list(
+  "Conv (<10 reads)" = community_filter_conventional,
+  "Conv (Prev<2)"    = community_filter_conventional2,
+  "K2 (Optimum K)"   = k2_community_k,
+  "K2 (Z-Score)"     = k2_community_z,
+  "K4 (Optimum K)"   = k4_community_k,
+  "K4 (Z-Score)"     = k4_community_z
+)
+
+# Alpha diersity
+df_alpha_total <- do.call(rbind, lapply(names(list_communities), function(x) {
+  calculate_alpha(list_communities[[x]], x)
+}))
+
+#Long format
+df_alpha_long <- df_alpha_total %>%
+  pivot_longer(cols = c(Chao1, Shannon, Simpson, Pielou),
+               names_to = "Index", values_to = "Value")
+
+# Plot
+ggplot(df_alpha_long, aes(x = Filter_Method, y = Value, fill = Filter_Method)) +
+  geom_boxplot(alpha = 0.7, outlier.size = 1) +
+  facet_wrap(~Index, scales = "free_y", nrow = 4) + 
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "right") +
+  labs(title = "Impact of Filters on Alpha Diversity", x = NULL)
+```
+
+
+```{r}
+df_bray <- do.call(rbind, lapply(names(list_communities), function(x) {
+  calculate_pcoa_coords(list_communities[[x]], x, "bray")
+}))
+
+ggplot(df_bray, aes(x = PC1, y = PC2, color = Filter_Method)) +
+  # Draw elipses
+  stat_ellipse(aes(fill = Filter_Method), geom = "polygon", alpha = 0.1, level = 0.95) +
+  geom_point(alpha = 0.7, size = 2) + 
+  scale_color_brewer(palette = "Dark2") + # O la paleta que prefieras
+  scale_fill_brewer(palette = "Dark2") +
+  theme_bw() +
+  labs(title = "Combined Community Structure (Bray-Curtis)",
+       subtitle = "Overlay of different filtering methods",
+       color = "Filter Method",
+       fill = "Filter Method")
+
+ggplot(df_jaccard, aes(x = PC1, y = PC2, color = Filter_Method)) +
+  # Draw elipses
+  stat_ellipse(aes(fill = Filter_Method), geom = "polygon", alpha = 0.1, level = 0.95) +
+  geom_point(alpha = 0.7, size = 2) + 
+  scale_color_brewer(palette = "Dark2") + # O la paleta que prefieras
+  scale_fill_brewer(palette = "Dark2") +
+  theme_bw() +
+  labs(title = "Species Composition (Jaccard)",
+       subtitle = "Comparison based on Presence/Absence",
+       color = "Filter Method",
+       fill = "Filter Method")
+```
+
+```{r}
+# Rare taxa
+rare_taxa <- conservative_filter(OTU_table = Env_Asv_table_filt_df, prevalence = 0, abundance_threshold = 0.001, col_max = 0, pct_samples_threshold = 0)
+rare_taxa <- rare_taxa$deleted
+
+names_rare  <- colnames(rare_taxa)
+names_conv1   <- colnames(community_filter_conventional)
+names_conv2   <- colnames(community_filter_conventional2)
+names_k2_k    <- colnames(k2_community_k) 
+names_k2_z    <-  colnames(k2_community_z) 
+names_k4_k    <-  colnames(k4_community_k) 
+names_k4_z    <-  colnames(k4_community_z)
+
+
+sub_conv1 <- rare_taxa[, intersect(names_rare, names_conv1), drop = FALSE]
+sub_conv2 <- rare_taxa[, intersect(names_rare, names_conv2), drop = FALSE]
+sub_k2_k  <- rare_taxa[, intersect(names_rare, names_k2_k), drop = FALSE]
+sub_k2_z  <- rare_taxa[, intersect(names_rare, names_k2_z), drop = FALSE]
+sub_k4_k  <- rare_taxa[, intersect(names_rare, names_k4_k), drop = FALSE]
+sub_k4_z  <- rare_taxa[, intersect(names_rare, names_k4_z), drop = FALSE]
+
+list_communities_rare <- list(
+  "Rare Biosphere" = rare_taxa,
+  "Conv (<10 reads)" = sub_conv1,
+  "Conv (Prev<2)"    = sub_conv2,
+  "K2 (Optimum K)"   = sub_k2_k,
+  "K2 (Z-Score)"     = sub_k2_z,
+  "K4 (Optimum K)"   = sub_k4_k,
+  "K4 (Z-Score)"     = sub_k4_z
+)
+
+df_alpha_rare <- do.call(rbind, lapply(names(list_communities_rare), function(x) {
+  if(!is.null(list_communities_rare[[x]])) {
+    calculate_alpha(list_communities_rare[[x]], x)
+  }
+}))
+
+# Plot Alpha diversity
+df_alpha_rare <- df_alpha_rare %>%
+  pivot_longer(cols = c(Chao1, Shannon, Simpson, Pielou),
+               names_to = "Index", values_to = "Value")
+ggplot(df_alpha_rare, aes(x = Filter_Method, y = Value, fill = Filter_Method)) +
+  geom_boxplot(alpha = 0.7, outlier.size = 1) +
+  facet_wrap(~Index, scales = "free_y", nrow = 4) + 
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "right") +
+  labs(title = "Impact of filters on the alpha diversity of the rare biosphere", x = NULL)
+
+# Plot Beta diversity
+#Bray-Curtis
+df_bray_rare <- do.call(rbind, lapply(names(list_communities_rare), function(x) {
+  
+  tabla <- list_communities_rare[[x]]
+
+  if(is.null(tabla) || ncol(tabla) < 2) return(NULL)
+  
+  tabla_limpia <- tabla[rowSums(tabla) > 0, , drop = FALSE]
+  
+  if(nrow(tabla_limpia) < 3) return(NULL)
+  
+  return(calculate_pcoa_coords(tabla_limpia, x, "bray"))
+}))
+
+# Plot
+ggplot(df_bray_rare, aes(x = PC1, y = PC2, color = Filter_Method)) +
+  # Draw elipses
+  stat_ellipse(aes(fill = Filter_Method), geom = "polygon", alpha = 0.1, level = 0.95) +
+  geom_point(alpha = 0.7, size = 2) + 
+  scale_color_brewer(palette = "Dark2") + # O la paleta que prefieras
+  scale_fill_brewer(palette = "Dark2") +
+  theme_bw() +
+  labs(title = "Structure of the Rare Biosphere(Bray-Curtis)",
+       color = "Filter Method",
+       fill = "Filter Method")
+
+#Jaccard
+df_jacc_rare <- do.call(rbind, lapply(names(list_communities_rare), function(x) {
+  
+  tabla <- list_communities_rare[[x]]
+  
+  if(is.null(tabla) || ncol(tabla) < 2) return(NULL)
+  
+  tabla_limpia <- tabla[rowSums(tabla) > 0, , drop = FALSE]
+  
+  if(nrow(tabla_limpia) < 3) return(NULL)
+  
+  return(calculate_pcoa_coords(tabla_limpia, x, "jaccard"))
+}))
+
+#Plot
+ggplot(df_jacc_rare, aes(x = PC1, y = PC2, color = Filter_Method)) +
+  # Draw elipses
+  stat_ellipse(aes(fill = Filter_Method), geom = "polygon", alpha = 0.1, level = 0.95) +
+  geom_point(alpha = 0.7, size = 2) + 
+  scale_color_brewer(palette = "Dark2") + # O la paleta que prefieras
+  scale_fill_brewer(palette = "Dark2") +
+  theme_bw() +
+  labs(title = "Composition of the Rare Biosphere (Jaccard)",
+       color = "Filter Method",
+       fill = "Filter Method")
+```
+
+
+
+
+```{r}
+# ANOVA for all taxa
+data_shannon <- subset(df_alpha_long, Index == "Shannon")
+data_simpson <- subset(df_alpha_long, Index == "Simpson")
+data_pielou <- subset(df_alpha_long, Index == "Pielou")
+data_chao <- subset(df_alpha_long, Index == "Chao1")
+
+anova_shannon <- aov(Value ~ Filter_Method, data = data_shannon)
+anova_simpson <- aov(Value ~ Filter_Method, data = data_simpson)
+anova_pielou <- aov(Value ~ Filter_Method, data = data_pielou)
+anova__chao <- aov(Value ~ Filter_Method, data = data_chao)
+
+summary(anova_shannon)
+summary(anova_simpson)
+summary(anova_pielou)
+summary(anova__chao)
+
+# Post_hoc
+TukeyHSD(anova_shannon)
+TukeyHSD(anova_simpson)
+TukeyHSD(anova_pielou)
+TukeyHSD(anova__chao)
+
+# Paired model
+df_alpha_long$SampleID <- as.factor(df_alpha_long$SampleID)
+paired_shannon <- aov(Value ~ Filter_Method + Error(SampleID/Filter_Method), data = data_shannon)
+summary(paired_shannon)
+tapply(data_shannon$Value, data_shannon$Filter_Method, mean)
+pairwise.t.test(data_shannon$Value, 
+                data_shannon$Filter_Method, 
+                p.adjust.method = "bonferroni", # Correction
+                paired = TRUE) 
+
+
+paired_simpson <- aov(Value ~ Filter_Method + Error(SampleID/Filter_Method), data = data_simpson)
+summary(paired_simpson)
+tapply(data_simpson$Value, data_simpson$Filter_Method, mean)
+pairwise.t.test(data_simpson$Value, 
+                data_simpson$Filter_Method, 
+                p.adjust.method = "bonferroni", # Correction
+                paired = TRUE) 
+
+
+paired_pielou <- aov(Value ~ Filter_Method + Error(SampleID/Filter_Method), data = data_pielou)
+summary(paired_pielou)
+tapply(data_pielou$Value, data_pielou$Filter_Method, mean)
+pairwise.t.test(data_pielou$Value, 
+                data_pielou$Filter_Method, 
+                p.adjust.method = "bonferroni", # Correction
+                paired = TRUE) 
+
+paired_chao <- aov(Value ~ Filter_Method + Error(SampleID/Filter_Method), data = data_chao)
+summary(paired_chao)
+tapply(data_chao$Value, data_chao$Filter_Method, mean)
+pairwise.t.test(data_chao$Value, 
+                data_chao$Filter_Method, 
+                p.adjust.method = "bonferroni", # Correction
+                paired = TRUE) 
+
+
+
+# ANOVA for rare taxa
+data_shannon_rare <- subset(df_alpha_rare, Index == "Shannon")
+data_simpson_rare <- subset(df_alpha_rare, Index == "Simpson")
+data_pielou_rare <- subset(df_alpha_rare, Index == "Pielou")
+data_chao_rare <- subset(df_alpha_rare, Index == "Chao1")
+
+anova_shannon_rare <- aov(Value ~ Filter_Method, data = data_shannon_rare)
+anova_simpson_rare <- aov(Value ~ Filter_Method, data = data_simpson_rare)
+anova_pielou_rare <- aov(Value ~ Filter_Method, data = data_pielou_rare)
+anova__chao_rare <- aov(Value ~ Filter_Method, data = data_chao_rare)
+
+summary(anova_shannon_rare)
+summary(anova_simpson_rare)
+summary(anova_pielou_rare)
+summary(anova__chao_rare)
+
+# Post_hoc
+TukeyHSD(anova_shannon_rare)
+TukeyHSD(anova_simpson_rare)
+TukeyHSD(anova_pielou_rare)
+TukeyHSD(anova__chao_rare)
+
+# Paired model
+df_alpha_rare$SampleID <- as.factor(df_alpha_rare$SampleID)
+paired_shannon_rare <- aov(Value ~ Filter_Method + Error(SampleID/Filter_Method), data = data_shannon_rare)
+summary(paired_shannon_rare)
+tapply(data_shannon_rare$Value, data_shannon_rare$Filter_Method, mean)
+pairwise.t.test(data_shannon_rare$Value, 
+                data_shannon_rare$Filter_Method, 
+                p.adjust.method = "bonferroni", # Correction
+                paired = TRUE) 
+
+
+paired_simpson_rare <- aov(Value ~ Filter_Method + Error(SampleID/Filter_Method), data = data_simpson_rare)
+summary(paired_simpson_rare)
+tapply(data_simpson_rare$Value, data_simpson_rare$Filter_Method, mean)
+pairwise.t.test(data_simpson_rare$Value, 
+                data_simpson_rare$Filter_Method, 
+                p.adjust.method = "bonferroni", # Correction
+                paired = TRUE) 
+
+
+paired_pielou_rare <- aov(Value ~ Filter_Method + Error(SampleID/Filter_Method), data = data_pielou_rare)
+summary(paired_pielou_rare)
+tapply(data_pielou_rare$Value, data_pielou_rare$Filter_Method, mean)
+pairwise.t.test(data_pielou_rare$Value, 
+                data_pielou_rare$Filter_Method, 
+                p.adjust.method = "bonferroni", # Correction
+                paired = TRUE) 
+
+paired_chao_rare <- aov(Value ~ Filter_Method + Error(SampleID/Filter_Method), data = data_chao_rare)
+summary(paired_chao_rare)
+tapply(data_chao_rare$Value, data_chao_rare$Filter_Method, mean)
+pairwise.t.test(data_chao_rare$Value, 
+                data_chao_rare$Filter_Method, 
+                p.adjust.method = "bonferroni", # Correction
+                paired = TRUE) 
+```
+
+```{r}
+# PERMANOVA
+align_asvs <- function(tab1, tab2){
+
+  all_asvs <- union(colnames(tab1), colnames(tab2))
+
+  make_aligned <- function(tab, all_asvs){
+
+    aligned <- matrix(
+      0,
+      nrow = nrow(tab),
+      ncol = length(all_asvs),
+      dimnames = list(rownames(tab), all_asvs)
+    )
+
+    common <- intersect(colnames(tab), all_asvs)
+    aligned[, common] <- as.matrix(tab[, common, drop = FALSE])
+
+    as.data.frame(aligned)
+  }
+
+  tab1_aligned <- make_aligned(tab1, all_asvs)
+  tab2_aligned <- make_aligned(tab2, all_asvs)
+
+  return(list(tab1 = tab1_aligned, tab2 = tab2_aligned))
+}
+
+clean_abundance <- function(tab){
+
+  tab <- as.data.frame(tab)
+
+  # Force numeric
+  tab[] <- lapply(tab, function(x) as.numeric(as.character(x)))
+
+  # Replace NA / NaN / Inf by 0
+  tab[!is.finite(as.matrix(tab))] <- 0
+
+  # Delete empty samples
+  tab <- tab[rowSums(tab) > 0, , drop = FALSE]
+
+  tab
+}
+
+run_permanova <- function(tabla_ref, tabla_comp, label, dist_method = "bray"){
+
+  common_samples <- intersect(rownames(tabla_ref), rownames(tabla_comp))
+
+  tabla_ref  <- tabla_ref[common_samples, , drop = FALSE]
+  tabla_comp <- tabla_comp[common_samples, , drop = FALSE]
+
+  aligned <- align_asvs(tabla_ref, tabla_comp)
+  tabla_ref  <- clean_abundance(aligned$tab1)
+  tabla_comp <- clean_abundance(aligned$tab2)
+
+  common_samples2 <- intersect(rownames(tabla_ref), rownames(tabla_comp))
+  tabla_ref  <- tabla_ref[common_samples2, , drop = FALSE]
+  tabla_comp <- tabla_comp[common_samples2, , drop = FALSE]
+
+  tabla_all <- rbind(tabla_ref, tabla_comp)
+
+  group <- factor(c(
+    rep("Ref", nrow(tabla_ref)),
+    rep(label, nrow(tabla_comp))
+  ))
+
+  id_samples <- factor(c(common_samples2, common_samples2))
+  
+  if(dist_method == "jaccard"){
+    tabla_all <- (tabla_all > 0) * 1
+    dist <- vegdist(tabla_all, method = "jaccard", binary = TRUE)
+  } else {
+    dist <- vegdist(tabla_all, method = "bray")
+  }
+
+  adonis2(dist ~ group, permutations = 999,strata = id_samples)
+}
+
+# Bray Curtis vs Conv<10
+per_k2_k_conv1 <- run_permanova(community_filter_conventional, dist_method = "bray", 
+                                k2_community_k, "K2_K vs Conv_<10")
+per_k2_z_conv1 <- run_permanova(community_filter_conventional, dist_method = "bray", 
+                                k2_community_z, "K2_z vs Conv_<10")
+per_k4_k_conv1<- run_permanova(community_filter_conventional, dist_method = "bray", 
+                                k4_community_k, "K4_k vs Conv_<10")
+per_k4_z_conv1<- run_permanova(community_filter_conventional, dist_method = "bray", 
+                                k4_community_z, "K4_z vs Conv_<10")
+
+# Bray Curtis vs Conv<2
+per_k2_k_conv2 <- run_permanova(community_filter_conventional2, dist_method = "bray", 
+                                k2_community_k, "K2_K vs Conv_Prev<2")
+per_k2_z_conv2 <- run_permanova(community_filter_conventional2, dist_method = "bray", 
+                                k2_community_z, "K2_z vs Conv_Prev<2")
+per_k4_k_conv2 <- run_permanova(community_filter_conventional2, dist_method = "bray", 
+                                k4_community_k, "K4_K vs Conv_Prev<2")
+per_k4_z_conv2 <- run_permanova(community_filter_conventional2, dist_method = "bray", 
+                                k4_community_z, "K4_z vs Conv_Prev<2")
+
+
+# Jaccard vs Conv<10
+per_k2_k_conv1_jac <- run_permanova(community_filter_conventional, dist_method = "jaccard", 
+                                k2_community_k, "K2_K vs Conv_<10")
+per_k2_z_conv1_jac <- run_permanova(community_filter_conventional, dist_method = "jaccard", 
+                                k2_community_z, "K2_z vs Conv_<10")
+per_k4_k_conv1_jac <- run_permanova(community_filter_conventional, dist_method = "jaccard", 
+                                k4_community_k, "K4_K vs Conv_<10")
+per_k4_z_conv1_jac <- run_permanova(community_filter_conventional, dist_method = "jaccard", 
+                                k4_community_z, "K4_z vs Conv_<10")
+
+# Jaccard vs Conv<2
+per_k2_k_conv2_jac <- run_permanova(community_filter_conventional2, dist_method = "jaccard", 
+                                k2_community_k, "K2_K vs Conv_Prev<2")
+per_k2_z_conv2_jac <- run_permanova(community_filter_conventional2, dist_method = "jaccard", 
+                                k2_community_z, "K2_z vs Conv_Prev<2")
+per_k4_k_conv2_jac <- run_permanova(community_filter_conventional2, dist_method = "jaccard", 
+                                k4_community_k, "K4_K vs Conv_Prev<2")
+per_k4_z_conv2_jac <- run_permanova(community_filter_conventional2, dist_method = "jaccard", 
+                                k4_community_z, "K4_z vs Conv_Prev<2")
+
+# Bray Curtis rare taxa
+per_conv1_rare <- run_permanova(rare_taxa, dist_method = "bray", sub_conv1, "Conv_<10")
+per_conv2_rare <- run_permanova(rare_taxa, dist_method = "bray",sub_conv2, "Conv_Prev<2")
+per_k2_k_rare  <- run_permanova(rare_taxa, dist_method = "bray",sub_k2_k,  "K2_K")
+per_k2_z_rare  <- run_permanova(rare_taxa, dist_method = "bray",sub_k2_z,  "K2_Z")
+per_k4_k_rare  <- run_permanova(rare_taxa, dist_method = "bray",sub_k4_k,  "K4_K")
+per_k4_z_rare  <- run_permanova(rare_taxa, dist_method = "bray",sub_k4_z,  "K4_Z")
+
+#jaccard rare taxa
+per_conv1_rare_jac <- run_permanova(rare_taxa, dist_method = "jaccard", sub_conv1, "Conv_<10")
+per_conv2_rare_jac <- run_permanova(rare_taxa, dist_method = "jaccard",sub_conv2, "Conv_Prev<2")
+per_k2_k_rare_jac  <- run_permanova(rare_taxa, dist_method = "jaccard",sub_k2_k,  "K2_K")
+per_k2_z_rare_jac  <- run_permanova(rare_taxa, dist_method = "jaccard",sub_k2_z,  "K2_Z")
+per_k4_k_rare_jac <- run_permanova(rare_taxa, dist_method = "jaccard",sub_k4_k,  "K4_K")
+per_k4_z_rare_jac  <- run_permanova(rare_taxa, dist_method = "jaccard",sub_k4_z,  "K4_Z")
+
+
+# Results
+per_k2_k_conv1
+per_k2_z_conv1
+per_k4_k_conv1
+per_k4_z_conv1
+
+per_k2_k_conv2
+per_k2_z_conv2
+per_k4_k_conv2
+per_k4_z_conv2
+
+per_k2_k_conv1_jac
+per_k2_z_conv1_jac
+per_k4_k_conv1_jac
+per_k4_z_conv1_jac
+
+per_k2_k_conv2_jac
+per_k2_z_conv2_jac
+per_k4_k_conv2_jac
+per_k4_z_conv2_jac
+
+#Results rare taxa
+per_conv1_rare
+per_conv2_rare
+per_k2_k_rare
+per_k2_z_rare
+per_k4_k_rare
+per_k4_z_rare
+
+per_conv1_rare_jac
+per_conv2_rare_jac
+per_k2_k_rare_jac
+per_k2_z_rare_jac
+per_k4_k_rare_jac
+per_k4_z_rare_jac
+```
+

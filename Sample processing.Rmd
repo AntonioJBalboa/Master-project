@@ -23,9 +23,15 @@ set.seed(26)
 ```
 
 ```{r}
+ruta1 <- "A:/DOCUMENTOS/Máster Bioinformática y Bioestadística/TFM/Master project/muestras"
+ruta2 <- "A:/DOCUMENTOS/Máster Bioinformática y Bioestadística/TFM/Master project/Muestras ambientales"
+```
+
+
+```{r}
 # Cargamos las lecturas
-r1 <- sort(list.files("A:/DOCUMENTOS/Máster Bioinformática y Bioestadística/TFM/Master project/muestras", pattern = "_1.fastq", full.names = TRUE))
-r2 <- sort(list.files("A:/DOCUMENTOS/Máster Bioinformática y Bioestadística/TFM/Master project/muestras", pattern = "_2.fastq", full.names = TRUE))
+r1 <- sort(list.files(ruta1, pattern = "_1.fastq", full.names = TRUE))
+r2 <- sort(list.files(ruta1, pattern = "_2.fastq", full.names = TRUE))
 
 # PlotQualityProfile O FASTQC
 #plotQualityProfile(r1)
@@ -80,8 +86,85 @@ taxa <- addSpecies(taxa, "silva_species_assignment_v132.fa")
 write.csv(seqtab.nochim2, "ASV_table.csv")
 ```
 
+```{r}
+# Cargamos las lecturas
+r3 <- sort(list.files(ruta2, pattern = "_1.fastq", full.names = TRUE))
+r4 <- sort(list.files(ruta2, pattern = "_2.fastq", full.names = TRUE))
+
+# PlotQualityProfile O FASTQC
+#plotQualityProfile(r1)
+#plotQualityProfile(r2)
+
+# extract names from the samples
+samples_names2 <- sapply(strsplit(basename(r3), "_1.fastq"), `[`, 1)
+
+
+# Define names
+if (!dir.exists("filtered_fastq2")) {
+  dir.create("filtered_fastq2")
+}
+
+# create output folders for filtered sequencess
+filt_forwards2 <- file.path("filtered_fastq2", paste0(samples_names2, "_F_filt.fastq"))
+filt_reverse2 <- file.path("filtered_fastq2", paste0(samples_names2, "_R_filt.fastq"))
+
+names(filt_forwards2) <- samples_names2
+names(filt_reverse2) <- samples_names2
+
+# cut to 230 for forward and 200 for reverse
+out2 <- filterAndTrim(r3, filt_forwards2, r4, filt_reverse2,
+                     truncLen=c(230, 200),
+                     maxN=0, 
+                     maxEE=c(2, 2), 
+                     truncQ=2, 
+                     rm.phix=TRUE,
+                     compress=FALSE, 
+                     multithread=TRUE)
+
+errF2<- learnErrors(filt_forwards2, multithread=TRUE)
+errR2 <- learnErrors(filt_reverse2, multithread=TRUE)
+
+# Plot errors
+plotErrors(errF2, nominalQ=TRUE)
+plotErrors(errR2, nominalQ = TRUE)
+
+dadaFs2 <- dada(filt_forwards2, err=errF2, multithread=TRUE)
+dadaRs2 <- dada(filt_reverse2, err=errR2, multithread=TRUE)
+
+mergers2 <- mergePairs(dadaFs2, filt_forwards2, dadaRs2, filt_reverse2, verbose=TRUE)
+
+seqtab2 <- makeSequenceTable(mergers2)
+
+seqtab.nochim2 <- removeBimeraDenovo(seqtab2, method="consensus", multithread=TRUE, verbose=TRUE)
+
+taxa2 <- assignTaxonomy(seqtab.nochim2, "silva_nr_v132_train_set.fa.gz", multithread=TRUE)
+taxa2 <- addSpecies(taxa2, "silva_species_assignment_v132.fa")
+
+# Save as CSV
+write.csv(seqtab.nochim2, "ASV_table_env.csv")
+```
 
 
 
+```{r}
+depths <- rowSums(seqtab.nochim2)
+Env_Asv_table_filt <- seqtab.nochim2[depths>10000, ]
 
+# Delete singletons
+singleton_threshold <- 11 
+
+asv_totals2 <- colSums(Env_Asv_table_filt)
+table(asv_totals < singleton_threshold)
+n_singletons2 <- sum(asv_totals2 < singleton_threshold)
+
+cat("ASVs con < ", singleton_threshold, " lecturas (a eliminar): ", n_singletons, "\n")
+
+ASVs_to_keep2 <- names(asv_totals2)[asv_totals2 >= singleton_threshold]
+Env_Asv_table_filt <- Env_Asv_table_filt[, ASVs_to_keep2, drop = FALSE]
+Env_Asv_table_filt_df <- data.frame(Env_Asv_table_filt)
+sequences <- colnames(Env_Asv_table_filt_df)
+
+asv_ids <- paste0("ASV", seq_along(sequences))
+colnames(Env_Asv_table_filt_df) <- asv_ids
+```
 
