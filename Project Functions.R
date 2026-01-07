@@ -765,7 +765,6 @@ k5_optimization <- function(OTU_table, ground_truth, alpha, beta, mode, filter_p
   
   # Normalization
   
-  # A. Calcular GANANCIA (Gain) relativa al Baseline
   #Calculate "gain" to baseline
   chao_gain_list <- raw_chao_list - raw_chao_list[1]
   
